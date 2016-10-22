@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="outofoffice.comenergo.ru">
+    <serverData>
+      <paths name="outofoffice.comenergo.ru">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath path="/resources" />
+            <excludedPath path="/tests" />
+            <excludedPath path="/composer.json" />
+            <excludedPath path="/phpunit.xml" />
+            <excludedPath path="/.env.example" />
+            <excludedPath path="/package.json" />
+            <excludedPath path="/.gitignore" />
+            <excludedPath path="/artisan" />
+            <excludedPath path="/database" />
+            <excludedPath path="/server.php" />
+            <excludedPath path="/.gitattributes" />
+            <excludedPath path="/.env" />
+            <excludedPath path="/vendor" />
+            <excludedPath path="/composer.lock" />
+            <excludedPath path="/bootstrap" />
+            <excludedPath path="/storage" />
+            <excludedPath path="/config" />
+            <excludedPath path="/readme.md" />
+            <excludedPath path="/routes" />
+            <excludedPath path="/gulpfile.js" />
+            <excludedPath path="/public/build" />
+            <excludedPath path="/public/css" />
+            <excludedPath path="/public/ext" />
+            <excludedPath path="/public/js" />
+            <excludedPath path="/public/resources" />
+            <excludedPath path="/public/sass" />
+            <excludedPath path="/public/.htaccess" />
+            <excludedPath path="/public/app.js" />
+            <excludedPath path="/public/app.json" />
+            <excludedPath path="/public/bootstrap.css" />
+            <excludedPath path="/public/bootstrap.js" />
+            <excludedPath path="/public/bootstrap.json" />
+            <excludedPath path="/public/bootstrap.jsonp" />
+            <excludedPath path="/public/build.xml" />
+            <excludedPath path="/public/favicon.ico" />
+            <excludedPath path="/public/index.html" />
+            <excludedPath path="/public/index.php" />
+            <excludedPath path="/public/loader.gif" />
+            <excludedPath path="/public/loader.png" />
+            <excludedPath path="/public/Readme.md" />
+            <excludedPath path="/public/robots.txt" />
+            <excludedPath path="/public/web.config" />
+            <excludedPath path="/public/workspace.json" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>
