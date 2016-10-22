@@ -70,31 +70,67 @@ Ext.define('InOut.view.archivedrequests.gridArchivedRequests', {
             dataIndex: 'status',
             text: 'Состояние',
             align:'center'
-        },
+        }/*,
         {
             dataIndex: 'email_type',
             text: 'Последнее событие',
             width: 450,
             align:'right'
-        }
+        }*/
     ],
     dockedItems: [
         {
             xtype: 'toolbar',
             items: [
                 {
+                    name: 'archive_date_begin',
+                    startDay: 1,
+                    id: 'archive_date_begin',
+                    xtype: 'datefield',
+                    format: 'Y-m-d',
+                    fieldLabel: 'Начало периода',
+                    value: new Date((new Date()).valueOf() - 1000*3600*24*30)
+                },
+                {
+                    xtype: 'tbspacer',
+                    width: 10
+                },
+                {
+                    name: 'archive_date_end',
+                    id: 'archive_date_end',
+                    xtype: 'datefield',
+                    format: 'Y-m-d',
+                    fieldLabel: 'Конец периода',
+                    value: new Date(),
+                    startDay: 1
+                },
+                {
+                    xtype: 'tbspacer',
+                    width: 10
+                },
+                {
+                    xtype: 'button',
+                    text: 'Вывести!',
+                    action: 'getarchive',
+                    listeners: {click:'arActions'},
+                    iconCls: 'fa fa-lg fa-list'
+                },
+                {
+                    xtype: 'tbfill'
+                },
+                {
                     xtype: 'button',
                     text: 'выгрузить в excel',
-                    action: 'excel',
+                    action: 'getexcel',
                     listeners: {click:'arActions'},
                     iconCls: 'fa fa-lg fa-file-excel-o'
                 }
             ]
-        },
+        }/*,
         {
             xtype: 'pagingtoolbar',
             dock: 'bottom',
             displayInfo: true
-        }
+        }*/
     ]
 });

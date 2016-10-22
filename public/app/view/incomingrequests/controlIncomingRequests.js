@@ -19,9 +19,9 @@ Ext.define('InOut.view.incomingrequests.controlIncomingRequests', {
     },
     onLoad: function (store) {
         if (store.getCount() == 0) {
-            this.getView().setTitle('Мои запросы');
+            this.getView().setTitle('Запросы на согласование мне');
         } else {
-            this.getView().setTitle('Мои запросы (Не обработанных: ' + store.getCount() + ')');
+            this.getView().setTitle('Запросы на согласование мне (Не обработанных: ' + store.getCount() + ')');
         }
     },
 

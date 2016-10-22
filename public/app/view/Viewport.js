@@ -37,6 +37,8 @@ Ext.define('InOut.view.Viewport', {
     //controller: 'viewportviewcontroller',
     viewModel: {type: 'viewportviewmodel'},
 
+    layout: 'fit',
+
     items: [
         {
             xtype: 'tabpanel',
@@ -68,7 +70,12 @@ Ext.define('InOut.view.Viewport', {
                     title: 'Архив моих запросов',
                     listeners:{
                         activate : function(){
-                            this.getStore('storeArchivedRequests').reload();
+                            var me = this;
+                            var startDate = Ext.getCmp('archive_date_begin').getSubmitValue();
+                            var endDate = Ext.getCmp('archive_date_end').getSubmitValue();
+                            me.view.getStore().getProxy().url = '/archivedrequestsrange/' + startDate + '/' + endDate;
+                            me.view.getStore().load();
+                            console.log(startDate, endDate, me.view.getStore().getProxy().url);
                         }
                     }
                 }/*,

@@ -134,6 +134,7 @@ Ext.define('InOut.view.request.windowRequest', {
                     format: 'Y-m-d',
                     //format: 'd.m.Y',
                     value: new Date(),
+                    startDay: 1
                 },
                 {
                     name: 'absent_time_begin',

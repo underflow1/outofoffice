@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="outofoffice.comenergo.ru">
+  <component name="PublishConfigData" autoUpload="Always" serverName="outofoffice.comenergo.ru">
     <serverData>
       <paths name="outofoffice.comenergo.ru">
         <serverdata>
@@ -26,7 +26,6 @@
             <excludedPath path="/storage" />
             <excludedPath path="/config" />
             <excludedPath path="/readme.md" />
-            <excludedPath path="/routes" />
             <excludedPath path="/gulpfile.js" />
             <excludedPath path="/public/build" />
             <excludedPath path="/public/css" />
@@ -55,5 +54,6 @@
         </serverdata>
       </paths>
     </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
   </component>
 </project>

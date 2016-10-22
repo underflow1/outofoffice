@@ -47,14 +47,31 @@ class controlRequests extends Controller
     {
         $results = modelRequests::where('deleted', 0)
             ->where('created_user', explode("@",$_SERVER['REMOTE_USER'])[0])
+            ->whereBetween('absent_date', array(date('Y-m-d', strtotime('-30 days')), date('Y-m-d')))
             ->where('status', 'Согласовано')
             ->orwhere('status', 'Отклонено')
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+            ->orderBy('absent_date', 'desc')
+            ->get();
+
         return json_encode(
             $results
         ,JSON_UNESCAPED_UNICODE);
     }
+    public function archivedrequestsrange($archive_date_begin, $archive_date_end)
+    {
+        $results = modelRequests::where('deleted', 0)
+            ->where('created_user', explode("@",$_SERVER['REMOTE_USER'])[0])
+            ->whereBetween('absent_date', array($archive_date_begin, $archive_date_end))
+            ->where('status', 'Согласовано')
+            ->orwhere('status', 'Отклонено')
+            ->orderBy('absent_date', 'desc')
+            ->get();
+
+        return json_encode(
+            $results
+            ,JSON_UNESCAPED_UNICODE);
+    }
+
     /**
      * Show the form for creating a new resource.
      *

@@ -8,8 +8,8 @@ Ext.define('InOut.view.archivedrequests.modelArchivedRequests', {
     stores: {
         storeArchivedRequests: {
             storeId: 'storeArchivedRequests',
-            autoLoad: true,
-            pageSize: 15,
+            autoLoad: false,
+            //pageSize: 15,
             proxy: {
                 type: 'ajax',
                     url: '/archivedrequests',

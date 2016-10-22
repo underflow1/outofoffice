@@ -45,9 +45,9 @@ Ext.define('InOut.view.ViewportViewController', {
 
     onLoadIn: function (store) {
         if (store.getCount() == 0) {
-            Ext.getCmp('gridincomingrequests').setTitle('Мои запросы');
+            Ext.getCmp('gridincomingrequests').setTitle('Запросы на согласование мне');
         } else {
-            Ext.getCmp('gridincomingrequests').setTitle('Мои запросы (Не обработанных: ' + store.getCount() + ')');
+            Ext.getCmp('gridincomingrequests').setTitle('Запросы на согласование мне (Не обработанных: ' + store.getCount() + ')');
         }
     }
 }

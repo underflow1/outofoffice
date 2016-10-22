@@ -74,7 +74,7 @@ Ext.define('InOut.view.incomingrequests.gridIncomingRequests', {
             text: 'Комментарий',
             width: 450,
             align:'left'
-        },
+        }/*,
         {
             dataIndex: 'status',
             text: 'Состояние',
@@ -85,7 +85,7 @@ Ext.define('InOut.view.incomingrequests.gridIncomingRequests', {
             text: 'Последнее событие',
             width: 450,
             align:'right'
-        }
+        }*/
     ],
     dockedItems: [
         {
