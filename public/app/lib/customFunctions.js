@@ -29,6 +29,7 @@ Ext.define('InOut.lib.customFunctions', {
 
     showToast: function(text) {
         Ext.toast({
+            timeout: 6000,
             html: text,
             closable: false,
             align: 't',

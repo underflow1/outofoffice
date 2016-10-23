@@ -30,6 +30,16 @@ class controlRequests extends Controller
         ),JSON_UNESCAPED_UNICODE);
     }
 
+    public function testaaa($id)
+    {
+        $results = modelRequests::find($id);
+
+        return json_encode(array(
+            "success" => true,
+            "data" => $results
+        ),JSON_UNESCAPED_UNICODE);
+    }
+
     public function incomingrequests()
     {
         $results = modelRequests::where('deleted', 0)
@@ -101,10 +111,22 @@ class controlRequests extends Controller
         $newRecord->status = $newStatus::findOrFail(1)->name;
 
         $newRecord->save();
-        return response(json_encode(array(
-            "success" => true,
-            "data" => $newRecord->absent_time_begin  ,
-        ),JSON_UNESCAPED_UNICODE), 200);
+
+        if (($newRecord->absent_user == explode("@",$_SERVER['REMOTE_USER'])[0]) && ($newRecord->absent_user == $newRecord->approve_user)) {
+            $this->approverequest($newRecord->id);
+            return response(json_encode(array(
+                "success" => true,
+                "state" => 'created & approved',
+                "data" => $newRecord->id,
+            ),JSON_UNESCAPED_UNICODE), 200);
+        } else {
+            return response(json_encode(array(
+                "success" => true,
+                "state" => 'created',
+                "data" => $newRecord->id,
+            ),JSON_UNESCAPED_UNICODE), 200);
+        }
+
     }
 
     public function softdelete(Request $request)
@@ -155,7 +177,10 @@ class controlRequests extends Controller
         $newStatus = new ModelStatus;
         $newRecord->status = $newStatus::findOrFail(2)->name;
         $newRecord->save();
-
+        return response(json_encode(array(
+            "success" => true,
+            "data" => $newRecord->id,
+        ),JSON_UNESCAPED_UNICODE), 200);
     }
 
     public function declinerequest($id)
@@ -165,7 +190,10 @@ class controlRequests extends Controller
         $newStatus = new ModelStatus;
         $newRecord->status = $newStatus::findOrFail(3)->name;
         $newRecord->save();
-
+        return response(json_encode(array(
+            "success" => true,
+            "data" => $newRecord->id,
+        ),JSON_UNESCAPED_UNICODE), 200);
     }
 
     /**

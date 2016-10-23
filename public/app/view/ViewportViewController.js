@@ -17,41 +17,17 @@ Ext.define('InOut.view.ViewportViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.viewportviewcontroller',
 
-    requires: [
-        'InOut.view.request.windowRequest'
-    ],
-
     init: function() {
-        console.log('ViewportViewController controller init');
-        this.listen({
-            store: {
-                '#storeOutgoingRequests': {
-                    load: 'onLoadOut'
-                }, 
-                '#storeIncomingRequests': {
-                    load: 'onLoadIn'
-                }
-            }
-        });
+
     },
 
-    onLoadOut: function (store) {
-        if (store.getCount() == 0) {
-            Ext.getCmp('gridoutgoingrequests1').setTitle('Мои запросы');
-        } else {
-            Ext.getCmp('gridoutgoingrequests1').setTitle('Мои запросы (Открытых: ' + store.getCount() + ')');
-        }
+    activategridarchivedrequests: function(){
+        var me = this;
+        var startDate = Ext.getCmp('archive_date_begin').getSubmitValue();
+        var endDate = Ext.getCmp('archive_date_end').getSubmitValue();
+       /* me.view.getStore().getProxy().url = '/archivedrequestsrange/' + startDate + '/' + endDate;
+        me.view.getStore().load();*/
+        console.log(startDate, endDate);
     },
 
-    onLoadIn: function (store) {
-        if (store.getCount() == 0) {
-            Ext.getCmp('gridincomingrequests').setTitle('Запросы на согласование мне');
-        } else {
-            Ext.getCmp('gridincomingrequests').setTitle('Запросы на согласование мне (Не обработанных: ' + store.getCount() + ')');
-        }
-    }
-}
-
-
-
-);
+});

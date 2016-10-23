@@ -29,6 +29,7 @@ Ext.define('InOut.view.outgoingrequests.controlOutgoingRequests', {
     showCurrentRequest:function(grid, record) {
         var window = Ext.create('InOut.view.request.windowRequest');
         window.down('form').loadRecord(record);
+        //console.log(record);
         window.show();
     },
 
@@ -56,6 +57,17 @@ Ext.define('InOut.view.outgoingrequests.controlOutgoingRequests', {
                             //это если надо отправить только выделенные строки
                             me.view.getSelectionModel().getSelection().forEach(function(item) {
                                 array.push(item.data.id);
+                                var rec = Ext.data.Record;
+                                Ext.Ajax.request({
+                                    scope: this,
+                                    method: 'GET',
+                                    url: '/testaaa/' + item.data.id,
+                                    success: function(response){
+                                        console.log(Ext.decode(response.responseText).data);
+                                        rec.data = Ext.decode(response.responseText).data;
+                                        console.log(rec);
+                                    }
+                                })
                             });
                             console.log(array);
                             //это если надо перебрать всё в гриде

@@ -66,6 +66,23 @@ Ext.define('InOut.view.request.windowRequestViewModel', {
                     state = true;
             }
             return state;
+        },
+
+        statusStyle: function() {
+            var status = this.getView().down('form').getValues().status;
+            console.log(status);
+            switch (status) {
+                case 'Новый':
+                    state = 'background-color: #ddd; background-image: none; text-align: center';
+                    break;
+                case 'Отклонено':
+                    state = 'background-color: #ddd; background-image: none; color: #FF0000;  font-weight: bold; text-align: center';
+                    break;
+                case 'Согласовано':
+                    state = 'background-color: #ddd; background-image: none; color: #009900;  font-weight: bold; text-align: center';
+                    break;
+            }
+            return state;
         }
     }
 

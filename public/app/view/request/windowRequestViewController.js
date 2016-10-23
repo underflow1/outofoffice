@@ -42,14 +42,21 @@ Ext.define('InOut.view.request.windowRequestViewController', {
                         url: '/addnewrequest',
                         params: {data: Ext.JSON.encode(form.getForm().getValues())},
                         success: function(response) {
-                            console.log(form.getForm().getValues());
+                            if (Ext.decode(response.responseText).state == 'created & approved') {
+                                Ext.Msg.alert('Уведомление','Заявка согласована автоматически.');
+                            }  else {
+                                if (Ext.decode(response.responseText).state == 'created') {
+                                    Ext.lib.customFunctions.showToast('Создана новая заявка.');
+                                } else {
+                                    Ext.Msg.alert('Ошибка','Что-то пошло не так...');
+                                }
+                            }
                             Ext.getStore('storeOutgoingRequests').reload();
                             Ext.getStore('storeIncomingRequests').reload();
                             form.up('window').close();
-                            console.log(response)
                         },
                         failure: function (response) {
-                            console.log(response);
+                            console.log(response.responseText);
                             //
                     }
                     });

@@ -6,7 +6,7 @@ Ext.define('InOut.view.archivedrequests.controlArchivedRequests', {
     alias: 'controller.controlarchivedrequests',
 
     init: function() {
-        
+
     },
 
     arActions:function(element) {

@@ -34,15 +34,17 @@ Ext.define('InOut.view.Viewport', {
         'Ext.toolbar.Toolbar'
     ],
 
-    //controller: 'viewportviewcontroller',
+    controller: 'viewportviewcontroller',
     viewModel: {type: 'viewportviewmodel'},
 
     layout: 'fit',
+    defaultToken: 'viewport',
 
     items: [
         {
             xtype: 'tabpanel',
             title: 'Уведомления вне офиса',
+            id: 'maintabpanel',
             activeTab: 0,
             items: [
                 {
@@ -68,23 +70,18 @@ Ext.define('InOut.view.Viewport', {
                 {
                     xtype: 'gridarchivedrequests',
                     title: 'Архив моих запросов',
-                    listeners:{
-                        activate : function(){
+                    listeners: {
+                        activate: function (){
                             var me = this;
                             var startDate = Ext.getCmp('archive_date_begin').getSubmitValue();
                             var endDate = Ext.getCmp('archive_date_end').getSubmitValue();
-                            me.view.getStore().getProxy().url = '/archivedrequestsrange/' + startDate + '/' + endDate;
-                            me.view.getStore().load();
-                            console.log(startDate, endDate, me.view.getStore().getProxy().url);
+                             me.view.getStore().getProxy().url = '/archivedrequestsrange/' + startDate + '/' + endDate;
+                             me.view.getStore().load();
+                            console.log(startDate, endDate);
                         }
                     }
-                }/*,
-                {
-                    xtype: 'gridarchivedrequests',
-                    title: 'Все запросы'
-                }*/
+                }
             ]
         }
     ]
-
 });

@@ -17,6 +17,7 @@ Ext.define('InOut.view.archivedrequests.gridArchivedRequests', {
     ],
     viewModel: {type: 'modelArchivedRequests'},
     controller: 'controlarchivedrequests',
+    defaultToken: 'archive',
 
     bind: {
         store: '{storeArchivedRequests}'
@@ -126,11 +127,11 @@ Ext.define('InOut.view.archivedrequests.gridArchivedRequests', {
                     iconCls: 'fa fa-lg fa-file-excel-o'
                 }
             ]
-        }/*,
+        },
         {
-            xtype: 'pagingtoolbar',
+            xtype: 'toolbar',
             dock: 'bottom',
             displayInfo: true
-        }*/
+        }
     ]
 });

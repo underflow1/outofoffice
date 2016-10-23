@@ -206,6 +206,16 @@ Ext.define('InOut.view.request.windowRequest', {
                     allowBlank: false,
                     skipValidation: false,
                     vtype: 'email'
+                },
+                {
+                    name: 'status',
+                    xtype: 'textfield',
+                    fieldLabel: 'Статус',
+                    bind: {
+                        fieldStyle: '{statusStyle}',
+                        hidden: '{!fieldsDisabled}'
+                    },
+                    editable: false
                 }
             ],
             dockedItems: [
