@@ -36,6 +36,7 @@ Ext.define('InOut.view.request.windowRequestViewController', {
         switch (btn.action) {
             case 'addnewrequest':
                 if (form.isValid()) {
+                    console.log(form.getForm().getValues());
                     Ext.Ajax.request({
                         scope: this,
                         method: 'POST',
@@ -51,6 +52,7 @@ Ext.define('InOut.view.request.windowRequestViewController', {
                                     Ext.Msg.alert('Ошибка','Что-то пошло не так...');
                                 }
                             }
+                            console.log(response.responseText);
                             Ext.getStore('storeOutgoingRequests').reload();
                             Ext.getStore('storeIncomingRequests').reload();
                             form.up('window').close();

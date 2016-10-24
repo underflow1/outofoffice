@@ -112,19 +112,26 @@ Ext.define('InOut.view.request.windowRequest', {
                                 '<b>{fullname}</b> <br>' +
                                 '{email}' +
                                 '</div>';
-                        },
-                        expand: function (combo) {
-                            var lll = '';
-                            lll = combo.value;
-                            if (Ext.isEmpty(lll)) {
-                                console.log('sdfsfd');
-                                combo.collapse();
-                            } else if (lll.length < 3) {
-                                console.log(lll.length);
-                                combo.collapse();
-                            }
                         }
                     },
+                    listeners: {
+                    select: function(a,b){
+                        console.log(b.data);
+                        Ext.getCmp('absent_user').setValue(b.data.login);
+                        Ext.getCmp('absent_email').setValue(b.data.email);
+                    },
+                    expand: function (combo) {
+                        var lll = '';
+                        lll = combo.value;
+                        if (Ext.isEmpty(lll)){
+                            console.log('sdfsfd');
+                            combo.collapse();
+                        } else if (lll.length < 3 ) {
+                            console.log(lll.length);
+                            combo.collapse();
+                        }
+                    }
+                }
                 },
                 {
                     name: 'absent_date',

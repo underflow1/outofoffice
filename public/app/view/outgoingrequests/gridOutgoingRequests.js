@@ -44,6 +44,11 @@ Ext.define('InOut.view.outgoingrequests.gridOutgoingRequests', {
             width: 300,
             align:'left'
         },
+        {   dataIndex: 'approve_fio',
+            text: 'Согласующий',
+            width: 300,
+            align:'left'
+        },
         {
             dataIndex: 'absent_date',
             text: 'Дата отсутствия',
