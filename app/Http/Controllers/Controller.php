@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\modelRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -57,6 +58,45 @@ class Controller extends BaseController
             'data' => array('login' => $login, 'fullname' => $fullname, 'email' => $email));
         return json_encode($result,JSON_UNESCAPED_UNICODE);
     }
-    
+
+    public function prepareEmailData($requestArray)
+    {
+        $loginsArray = [];
+        $idsArray = [];
+        $idsArray[]["requests"] = [];
+        $a= 0;
+        foreach ($requestArray as $requestId) {
+            $record = modelRequests::findOrFail($requestId);
+            if (!in_array($record->absent_email, $loginsArray)){
+                array_push($loginsArray, $record->absent_email);
+            }
+            $pos = array_search($record->absent_email, $loginsArray);
+            if ($pos > $a) {
+                $idsArray[$pos] = [];
+                $idsArray[$pos]["requests"] = [];
+                $a++;
+            }
+            $idsArray[$pos]["approve_fio"] =  $record->approve_fio;
+            $idsArray[$pos]["absent_email"] =  $record->absent_email;
+            array_push($idsArray[$pos]["requests"],
+                array(
+                    "id" => $record->id,
+                    "absent_fio" => $record->absent_fio,
+                    "absent_date" => $record->absent_date,
+                    "absent_time_begin" => $record->absent_time_begin,
+                    "absent_time_end" => $record->absent_time_end,
+                    "absent_reason" => $record->absent_reason,
+                    "absent_comment" => $record->absent_comment
+                )
+            );
+        }
+        return (json_encode(array(
+            "success" => true,
+            "data" => $idsArray,
+            "logins" => $loginsArray,
+            "pos" => $pos
+        ),JSON_UNESCAPED_UNICODE));
+    }
+
     
 }

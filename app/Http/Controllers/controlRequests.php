@@ -126,7 +126,6 @@ class controlRequests extends Controller
                 "data" => $newRecord->id,
             ),JSON_UNESCAPED_UNICODE), 200);
         }
-
     }
 
     public function softdelete(Request $request)
@@ -153,21 +152,36 @@ class controlRequests extends Controller
     {
         $string = '';
         $data = $request->get('data');
-        $hash = json_decode($data, true);
+        $requestArray = json_decode($data, true);
 
-        foreach (array_keys($hash) as $key) {
-            $newRecord = modelRequests::find($hash[$key]);
+
+
+        /*$loginsArray = array();
+        $a= 0;
+        $idsArray = array (array());
+        foreach ($requestArray as $requestId) {
+            $record = modelRequests::findOrFail($requestId);
+            if (!in_array($record->absent_email, $loginsArray)){
+                array_push($loginsArray, $record->absent_email);
+            }
+            $pos = array_search($record->absent_email, $loginsArray);
+            if ($pos > $a) {
+                array_push($idsArray, []);
+                $a++;
+            }
+            array_push($idsArray[$pos], $requestId);
+        }*/
+
+        foreach (array_keys($requestArray) as $key) {
+            $newRecord = modelRequests::find($requestArray[$key]);
             $newRecord->updated_user = explode("@",$_SERVER['REMOTE_USER'])[0];
             $newStatus = new ModelStatus;
             $newRecord->status = $newStatus::findOrFail(2)->name;
             $newRecord->save();
-            $string.= $key . '->' . $hash[$key] . '     ';
+            $string.= $key . '->' . $requestArray[$key] . '     ';
         };
 
-        return response(json_encode(array(
-            "success" => true,
-            "data" => $string,
-        ),JSON_UNESCAPED_UNICODE), 200);
+        return $this->prepareEmailData($requestArray);
     }
 
     public function approverequest($id)

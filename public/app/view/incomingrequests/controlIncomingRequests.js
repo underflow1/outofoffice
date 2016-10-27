@@ -60,10 +60,11 @@ Ext.define('InOut.view.incomingrequests.controlIncomingRequests', {
                         method: 'POST',
                         url: '/approverequests',
                         params: {data: Ext.JSON.encode(array)},
-                        success: function() {
+                        success: function(response) {
                             //me.getStore('storeIncomingRequests').reload();
                             Ext.getStore('storeOutgoingRequests').reload();
                             Ext.getStore('storeIncomingRequests').reload();
+                            console.log(Ext.decode(response.responseText));
                         },
                         failure: function (response) {
                             Ext.alert('Ошибка', response)
