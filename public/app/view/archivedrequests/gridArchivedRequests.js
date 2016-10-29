@@ -30,12 +30,6 @@ Ext.define('InOut.view.archivedrequests.gridArchivedRequests', {
             align:'center'
         },
         {
-            dataIndex: 'id',
-            text: 'номер запроса',
-            width: 50,
-            align:'left'
-        },
-        {
             dataIndex: 'absent_fio',
             text: 'Отсутсвующий',
             width: 300,

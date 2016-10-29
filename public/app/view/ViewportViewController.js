@@ -25,8 +25,8 @@ Ext.define('InOut.view.ViewportViewController', {
         var me = this;
         var startDate = Ext.getCmp('archive_date_begin').getSubmitValue();
         var endDate = Ext.getCmp('archive_date_end').getSubmitValue();
-       /* me.view.getStore().getProxy().url = '/archivedrequestsrange/' + startDate + '/' + endDate;
-        me.view.getStore().load();*/
+        me.view.getStore().getProxy().url = '/archivedrequestsrange/' + startDate + '/' + endDate;
+        me.view.getStore().load();
         console.log(startDate, endDate);
     },
 

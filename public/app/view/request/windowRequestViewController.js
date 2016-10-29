@@ -70,13 +70,16 @@ Ext.define('InOut.view.request.windowRequestViewController', {
                 form.up('window').close();
                 break;
             case 'approverequest':
-                idd = form.getForm().getValues().id;
+                var array = [];
+                array.push(form.getForm().getValues().id);
                 if (form.isValid()) {
                     Ext.Ajax.request({
                         scope: this,
                         method: 'POST',
-                        url: '/approverequest/' + idd,
+                        url: '/approverequests',
+                        params: {data: Ext.JSON.encode(array)},
                         success: function(response) {
+                            console.log(Ext.decode(response.responseText));
                             Ext.getStore('storeOutgoingRequests').reload();
                             Ext.getStore('storeIncomingRequests').reload();
                             form.up('window').close();

@@ -20,7 +20,7 @@ Ext.define('InOut.view.outgoingrequests.gridOutgoingRequests', {
     //title: 'sdfdsfdfs',
     //bind: '{storeOutgoingRequests}',
     bind: {
-        title: '{tabOut}',
+        //title: '{tabOut}',
         store: '{storeOutgoingRequests}'
      },
 
