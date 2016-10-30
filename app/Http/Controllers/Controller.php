@@ -78,6 +78,7 @@ class Controller extends BaseController
                 $a++;
             }
             $idsArray[$pos]["approve_fio"] =  $record->approve_fio;
+            $idsArray[$pos]["approve_email"] =  $record->approve_email;
             $idsArray[$pos]["absent_email"] =  $record->absent_email;
             array_push($idsArray[$pos]["requests"],
                 array(
@@ -94,19 +95,49 @@ class Controller extends BaseController
         return $idsArray;
     }
 
-    public function sendEmailData($data)
+    public function sendEmailData($data, $type)
     {
         $count = 0;
-        foreach ($data as $item) {
-            Mail::send('approved', $item, function($message) use ($item)
-            {
-                $message->from('inout@teploset.ru', 'Вне офиса');
-                $message->subject('вне офиса, утверждено');
-                $message->to($item["absent_email"]);
-            });
-            if (!count(Mail::failures()) > 0) {
-                $count++;
-            }
+        switch ($type){
+            case 'approved':
+                foreach ($data as $item) {
+                    Mail::send($type, $item, function($message) use ($item)
+                    {
+                        $message->from('inout@teploset.ru', 'Вне офиса');
+                        $message->subject('вне офиса, утверждено');
+                        $message->to($item["absent_email"]);
+                    });
+                    if (!count(Mail::failures()) > 0) {
+                        $count++;
+                    }
+                }
+                break;
+            case 'forapprove':
+                foreach ($data as $item) {
+                    Mail::send($type, $item, function($message) use ($item)
+                    {
+                        $message->from('inout@teploset.ru', 'Вне офиса');
+                        $message->subject('вне офиса, утвердить');
+                        $message->to($item["approve_email"]);
+                    });
+                    if (!count(Mail::failures()) > 0) {
+                        $count++;
+                    }
+                }
+                break;
+            case 'declined':
+                foreach ($data as $item) {
+                    Mail::send($type, $item, function($message) use ($item)
+                    {
+                        $message->from('inout@teploset.ru', 'Вне офиса');
+                        $message->subject('вне офиса, отклонено!');
+                        $message->to($item["absent_email"]);
+                    });
+                    if (!count(Mail::failures()) > 0) {
+                        $count++;
+                    }
+                }
+                break;
         }
         return $count;
     }

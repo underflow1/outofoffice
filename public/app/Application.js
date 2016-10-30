@@ -45,8 +45,17 @@ Ext.define('InOut.Application', {
                 ':id' : '([0-9]+)'
             }
         },
+        'create' : {
+            before: 'onShowCreateRoute'
+        },
         'archive' : {
             before: 'onShowArchiveRoute'
+        },
+        'incoming' : {
+            before: 'onShowIncomingRoute'
+        },
+        'outgoing' : {
+            before: 'onShowOutgoingRoute'
         }
     },
     listen : {
@@ -60,6 +69,18 @@ Ext.define('InOut.Application', {
     onBefore : function(id, action) {
         console.log(id, action);
         action.resume();
+    },
+
+    onShowCreateRoute: function(){
+        var window = Ext.create('InOut.view.request.windowRequest', {
+            title: 'Создание нового запроса.',
+            viewModel:{
+                data: {
+                    showMode: 'New'
+                }
+            }
+        });
+        window.show();
     },
 
     onShowRequestRoute: function(id) {
@@ -107,11 +128,20 @@ Ext.define('InOut.Application', {
         var mainPanel = Ext.getCmp('maintabpanel');
         if (mainPanel){
             mainPanel.setActiveTab(2);
-            var startDate = Ext.getCmp('archive_date_begin').getSubmitValue();
-            var endDate = Ext.getCmp('archive_date_end').getSubmitValue();
-            Ext.getStore('storeArchivedRequests').getProxy().url = '/archivedrequestsrange/' + startDate + '/' + endDate;
-            Ext.getStore('storeArchivedRequests').load();
-            console.log(Ext.getStore('storeArchivedRequests').getProxy().url);
+        }
+    },
+    onShowIncomingRoute: function(){
+        console.log('INCOMING!!!!!!!!!!!');
+        var mainPanel = Ext.getCmp('maintabpanel');
+        if (mainPanel){
+            mainPanel.setActiveTab(1);
+        }
+    },
+    onShowOutgoingRoute: function(){
+        console.log('OUTGOING!!!!!!!!!!!');
+        var mainPanel = Ext.getCmp('maintabpanel');
+        if (mainPanel){
+            mainPanel.setActiveTab(0);
         }
     },
 

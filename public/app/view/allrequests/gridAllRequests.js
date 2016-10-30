@@ -1,13 +1,13 @@
 /**
  * Created by kharlamov.a on 08.10.2016.
  */
-Ext.define('InOut.view.outgoingrequests.gridOutgoingRequests', {
+Ext.define('InOut.view.allrequests.gridAllRequests', {
     extend: 'Ext.grid.Panel',
-    alias: 'widget.gridoutgoingrequests',
+    alias: 'widget.gridallrequests',
 
     requires: [
-        'InOut.view.outgoingrequests.modelOutgoingRequests',
-        'InOut.view.outgoingrequests.controlOutgoingRequests',
+        'InOut.view.allrequests.modelAllRequests',
+        'InOut.view.allrequests.controlAllRequests',
         'Ext.toolbar.Toolbar',
         'Ext.button.Button',
         'Ext.view.Table',
@@ -15,23 +15,12 @@ Ext.define('InOut.view.outgoingrequests.gridOutgoingRequests', {
         'Ext.grid.column.Date',
         'Ext.grid.column.Boolean'
     ],
-    viewModel: {type: 'modelOutgoingRequests'},
-    controller: 'controloutgoingrequests',
-    defaultToken: 'outgoing',
+    //viewModel: {type: 'modelAllRequests'},
+    controller: 'controlallrequests',
+    defaultToken: 'all',
 
-    //title: 'sdfdsfdfs',
-    //bind: '{storeOutgoingRequests}',
     bind: {
-        //title: '{tabOut}',
-        store: '{storeOutgoingRequests}'
-     },
-
-    listeners : {
-        itemdblclick: 'showCurrentRequest'
-    },
-    
-    selModel: {
-        mode: 'SIMPLE'
+        store: '{storeAllRequests}'
     },
 
     columns: [
@@ -82,12 +71,12 @@ Ext.define('InOut.view.outgoingrequests.gridOutgoingRequests', {
             text: 'Комментарий',
             width: 450,
             align:'left'
-        }/*,
+        },
         {
             dataIndex: 'status',
             text: 'Состояние',
             align:'center'
-        },
+        }/*,
         {
             dataIndex: 'email_type',
             text: 'Последнее событие',
@@ -100,20 +89,54 @@ Ext.define('InOut.view.outgoingrequests.gridOutgoingRequests', {
             xtype: 'toolbar',
             items: [
                 {
-                    xtype: 'button',
-                    text: 'Создать новый запрос',
-                    action: 'showNewRequestWindow',
-                    listeners: {click:'outActions'},
-                    iconCls: 'fa fa-lg fa-plus'
+                    name: 'all_date_begin',
+                    startDay: 1,
+                    id: 'all_date_begin',
+                    xtype: 'datefield',
+                    format: 'Y-m-d',
+                    fieldLabel: 'Начало периода',
+                    value: new Date((new Date()).valueOf() - 1000*3600*24*30)
+                },
+                {
+                    xtype: 'tbspacer',
+                    width: 10
+                },
+                {
+                    name: 'all_date_end',
+                    id: 'all_date_end',
+                    xtype: 'datefield',
+                    format: 'Y-m-d',
+                    fieldLabel: 'Конец периода',
+                    value: new Date(),
+                    startDay: 1
+                },
+                {
+                    xtype: 'tbspacer',
+                    width: 10
                 },
                 {
                     xtype: 'button',
-                    text: 'Удалить выделенное',
-                    action: 'deleteRequests',
-                    listeners: {click:'outActions'},
-                    iconCls: 'fa fa-lg fa-trash-o'
+                    text: 'Вывести!',
+                    action: 'getall',
+                    listeners: {click:'arActions'},
+                    iconCls: 'fa fa-lg fa-list'
+                },
+                {
+                    xtype: 'tbfill'
+                },
+                {
+                    xtype: 'button',
+                    text: 'выгрузить в excel',
+                    action: 'getexcel',
+                    listeners: {click:'arActions'},
+                    iconCls: 'fa fa-lg fa-file-excel-o'
                 }
             ]
+        },
+        {
+            xtype: 'toolbar',
+            dock: 'bottom',
+            displayInfo: true
         }
     ]
 });

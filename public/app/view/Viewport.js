@@ -20,6 +20,7 @@ Ext.define('InOut.view.Viewport', {
         'InOut.view.incomingrequests.gridIncomingRequests',
         'InOut.view.outgoingrequests.gridOutgoingRequests',
         'InOut.view.archivedrequests.gridArchivedRequests',
+        'InOut.view.allrequests.gridAllRequests',
         'InOut.view.request.windowRequest',
         'InOut.view.ViewportViewController',
         'InOut.view.ViewportViewModel',
@@ -53,6 +54,7 @@ Ext.define('InOut.view.Viewport', {
                     listeners:{
                         activate : function(){
                             this.getStore('storeOutgoingRequests').reload();
+                            history.pushState('', '', '/');
                         }
 
                     }
@@ -64,6 +66,7 @@ Ext.define('InOut.view.Viewport', {
                     listeners:{
                         activate : function(){
                             this.getStore('storeIncomingRequests').reload();
+                            history.pushState('', '', '/');
                         }
                     }
                 },
@@ -75,9 +78,25 @@ Ext.define('InOut.view.Viewport', {
                             var me = this;
                             var startDate = Ext.getCmp('archive_date_begin').getSubmitValue();
                             var endDate = Ext.getCmp('archive_date_end').getSubmitValue();
-                             me.view.getStore().getProxy().url = '/archivedrequestsrange/' + startDate + '/' + endDate;
-                             me.view.getStore().load();
+                            me.view.getStore().getProxy().url = '/archivedrequestsrange/' + startDate + '/' + endDate;
+                            me.view.getStore().load();
                             console.log(startDate, endDate);
+                            history.pushState('', '', '/');
+                        }
+                    }
+                },
+                {
+                    xtype: 'gridallrequests',
+                    title: 'ОЭБ',
+                    listeners: {
+                        activate: function (){
+                            var me = this;
+                            var startDate = Ext.getCmp('all_date_begin').getSubmitValue();
+                            var endDate = Ext.getCmp('all_date_end').getSubmitValue();
+                            me.view.getStore().getProxy().url = '/allrequestsrange/' + startDate + '/' + endDate;
+                            me.view.getStore().load();
+                            console.log(startDate, endDate);
+                            history.pushState('', '', '/');
                         }
                     }
                 }

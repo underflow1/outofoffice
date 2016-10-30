@@ -17,6 +17,7 @@ Ext.define('InOut.view.incomingrequests.gridIncomingRequests', {
     ],
     viewModel: {type: 'modelIncomingRequests'},
     controller: 'controlincomingrequests',
+    defaultToken: 'incoming',
 
     bind: {
         title: '{tabOut}',

@@ -38,6 +38,11 @@ Ext.define('InOut.view.request.windowRequest', {
     layout: 'fit',
     resizable: false,
     iconCls: 'fa fa-book',
+    listeners:{
+        'close':function(){
+            history.pushState('', '', '/');
+        }
+    },
 
     items: [
         {

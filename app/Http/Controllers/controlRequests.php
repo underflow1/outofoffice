@@ -122,28 +122,29 @@ class controlRequests extends Controller
         foreach (array_keys($requestArray) as $key) {
             $newRecord->$key = $requestArray[$key];
         }
-        $newRecord->created_user = explode("@",$_SERVER['REMOTE_USER'])[0];
+        $newRecord->created_user = $login;
         $newStatus = new ModelStatus;
         $newRecord->status = $newStatus::findOrFail(1)->name;
 
         $newRecord->save();
-        $state = 'created';
-        $emailsendedcount = 0;
+        //$state = '';
+        //$emailsendedcount = '';
+        $count = 0;
 
         if (($newRecord->absent_user == $login) && ($newRecord->absent_user == $newRecord->approve_user)) {
             $count = $this->approve([$newRecord->id], $login);
-            if ($count > 0) {
-                $state = 'created & approved';
-                $emailsendedcount = $this->sendEmailData($this->prepareEmailData([$newRecord->id]));
-            } else {
-                $state = 'created';
-            }
+            $state = 'created & approved';
+            $emailsendedcount = $this->sendEmailData($this->prepareEmailData([$newRecord->id]), 'approved');
+        } else {
+            $state = 'created';
+            $emailsendedcount = $this->sendEmailData($this->prepareEmailData([$newRecord->id]), 'forapprove');
         }
 
         return response(json_encode(array(
             "success" => true,
             "state" => $state,
             "created_id" => $newRecord->id,
+            "approvedcount" => $count,
             "emailsendedcount" => $emailsendedcount
         ), JSON_UNESCAPED_UNICODE), 200);
     }
@@ -174,14 +175,17 @@ class controlRequests extends Controller
         $data = $request->get('data');
         $requestArray = json_decode($data, true);
         $count = $this->approve($requestArray, $login);
+        $emailsendedcount = 0;
         if ($count > 0) {
             $success = true;
+            $emailsendedcount = $this->sendEmailData($this->prepareEmailData($requestArray), 'approved');
         } else {
             $success = false;
         }
         return response(json_encode(array(
             "success" => $success,
-            "count" => $count,
+            "approvedcount" => $count,
+            "emailsendedcount" => $emailsendedcount
         ),JSON_UNESCAPED_UNICODE), 200);
     }
 
@@ -208,9 +212,12 @@ class controlRequests extends Controller
         $newStatus = new ModelStatus;
         $newRecord->status = $newStatus::findOrFail(3)->name;
         $newRecord->save();
+        $emailsendedcount = $this->sendEmailData($this->prepareEmailData([$id]), 'declined');
+
         return response(json_encode(array(
             "success" => true,
-            "data" => $newRecord->id,
+            "declinedrequest" => $newRecord->id,
+            "emailsendedcount" => $emailsendedcount,
         ),JSON_UNESCAPED_UNICODE), 200);
     }
 

@@ -9,12 +9,21 @@
 namespace App\Http\Middleware;
 
 
+use App\modelRights;
+use Closure;
+
 class checkRights
 {
-    public function handle($request, Closure $next) {
-        $principal = explode("@",$_SERVER['REMOTE_USER']);
-        $user_login = $principal[0];
-        //$results = modelRequests::find($id);
+    public function handle($request, Closure $next)
+    {
+        $user_login = explode("@", $_SERVER['REMOTE_USER'])[0];
+        $rights = new modelRights;
+        //$rights::where('login', $user_login)->access
+        $access = 0;
+        if (count($access) > 0) {
+            if ($access == 1) {
+                return $next($request);
+            }
+        }
     }
-
 }
