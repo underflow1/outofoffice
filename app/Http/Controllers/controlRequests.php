@@ -10,11 +10,6 @@ use Excel;
 
 class controlRequests extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function outgoingrequests()
     {
         $results = modelRequests::where('deleted', 0)
@@ -22,16 +17,6 @@ class controlRequests extends Controller
                                 ->where('status', 'Новый')
                                 ->orderBy('created_at', 'desc')
                                 ->get();
-        return json_encode(array(
-            "success" => true,
-            "data" => $results
-        ),JSON_UNESCAPED_UNICODE);
-    }
-
-    public function testaaa($id)
-    {
-        $results = modelRequests::find($id);
-
         return json_encode(array(
             "success" => true,
             "data" => $results
@@ -51,25 +36,46 @@ class controlRequests extends Controller
         ),JSON_UNESCAPED_UNICODE);
     }
 
+    public function preloadrecord($id)
+    {
+        $login = explode("@",$_SERVER['REMOTE_USER'])[0];
+        $newRequest = ModelRequests::findOrFail($id);
+        if ($newRequest->approve_user == $login) {
+            return json_encode(array(
+                "success" => true,
+                "data" => $newRequest
+            ),JSON_UNESCAPED_UNICODE);
+        } else {
+            return response(json_encode(array(
+                "success" => false,
+                "data" => ''
+            ),JSON_UNESCAPED_UNICODE),401);
+        }
+    }
+
     public function archivedrequestsrange($archive_date_begin, $archive_date_end)
     {
+        $login = explode("@",$_SERVER['REMOTE_USER'])[0];
         $results = modelRequests::where('deleted', 0)
             ->whereBetween('absent_date', array($archive_date_begin, $archive_date_end))
-            ->where('created_user', explode("@",$_SERVER['REMOTE_USER'])[0])
+            ->where('created_user', $login)
             ->whereIn('status', array('Согласовано', 'Отклонено'))
             ->orderBy('absent_date', 'desc')
             ->orderBy('id', 'desc')
             ->get();
-        return json_encode(
-            $results
-            ,JSON_UNESCAPED_UNICODE);
+
+        return json_encode(array(
+            "success" => true,
+            "data" => $results
+        ),JSON_UNESCAPED_UNICODE);
     }
 
     public function archivedrequestsrangeexcel($archive_date_begin, $archive_date_end)
     {
+        $login = explode("@",$_SERVER['REMOTE_USER'])[0];
         $results = modelRequests::where('deleted', 0)
             ->whereBetween('absent_date', array($archive_date_begin, $archive_date_end))
-            ->where('created_user', explode("@",$_SERVER['REMOTE_USER'])[0])
+            ->where('created_user', $login)
             ->whereIn('status', array('Согласовано', 'Отклонено'))
             ->orderBy('absent_date', 'desc')
             ->orderBy('id', 'desc')
@@ -97,172 +103,136 @@ class controlRequests extends Controller
         })->download('xlsx');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $login = explode("@",$_SERVER['REMOTE_USER'])[0];
-        $data = $request->get('data');
-        $requestArray = json_decode($data, true);
+        //$data = $request->get('data');
+        // получение данных из формы:
+        $requestArray = json_decode($request->get('data'), true);
+        // заполнение модели данными из формы:
         $newRecord = new modelRequests;
         foreach (array_keys($requestArray) as $key) {
             $newRecord->$key = $requestArray[$key];
         }
+        // заполнение модели метаданными:
         $newRecord->created_user = $login;
         $newStatus = new ModelStatus;
         $newRecord->status = $newStatus::findOrFail(1)->name;
-
-        $newRecord->save();
-        //$state = '';
-        //$emailsendedcount = '';
-        $count = 0;
-
-        if (($newRecord->absent_user == $login) && ($newRecord->absent_user == $newRecord->approve_user)) {
-            $count = $this->approve([$newRecord->id], $login);
+        // проверка на согласование "самому себе":
+        if (($newRecord->approve_user == $login) && ($newRecord->absent_user == $login)){
+            // и согласование в таком случае:
+            $newRecord->updated_user = $login;
+            $newRecord->status = $newStatus::findOrFail(2)->name;
             $state = 'created & approved';
-            $emailsendedcount = $this->sendEmailData($this->prepareEmailData([$newRecord->id]), 'approved');
         } else {
             $state = 'created';
-            $emailsendedcount = $this->sendEmailData($this->prepareEmailData([$newRecord->id]), 'forapprove');
         }
-
+        // запись модели в БД
+        $newRecord->save();
+        switch ($state){
+            case 'created & approved':
+                // отправка уведомления о том что заявка согласована:
+                $emailsendedcount = $this->sendEmailData($this->prepareEmailData([$newRecord->id]), 'approved');
+                break;
+            case 'created':
+                // отправка уведомления о том, что заявку неоходимо согласовать:
+                $emailsendedcount = $this->sendEmailData($this->prepareEmailData([$newRecord->id]), 'forapprove');
+                break;
+        }
         return response(json_encode(array(
             "success" => true,
             "state" => $state,
             "created_id" => $newRecord->id,
-            "approvedcount" => $count,
             "emailsendedcount" => $emailsendedcount
         ), JSON_UNESCAPED_UNICODE), 200);
     }
 
     public function softdelete(Request $request)
     {
-        $string = '';
-        $data = $request->get('data');
-        $requestArray = json_decode($data, true);
+        $failed = [];
+        $deleted = [];
+        $login = explode("@",$_SERVER['REMOTE_USER'])[0];
+        $requestArray = json_decode($request->get('data'), true);
 
         foreach (array_keys($requestArray) as $key) {
             $newRecord = modelRequests::find($requestArray[$key]);
-            $newRecord->deleted = 1;
-            $newRecord->updated_user = explode("@",$_SERVER['REMOTE_USER'])[0];
-            $newRecord->save();
-            $string.= $key . '->' . $requestArray[$key] . '     ';
+            if (($newRecord->status == 'Новый') && ($newRecord->absent_user == $login)){
+                $newRecord->updated_user = $login;
+                $newRecord->deleted = 1;
+                $newRecord->save();
+                array_push($deleted, $requestArray[$key]);
+            } else {
+                array_push($failed, $requestArray[$key]);
+            }
         };
-
         return response(json_encode(array(
             "success" => true,
-            "data" => $string,
+            "deleted" => $deleted,
+            "failed" => $failed
         ),JSON_UNESCAPED_UNICODE), 200);
     }
 
     public function approverequests(Request $request)
     {
-        $login = explode("@",$_SERVER['REMOTE_USER'])[0];
-        $data = $request->get('data');
-        $requestArray = json_decode($data, true);
-        $count = $this->approve($requestArray, $login);
+        $failed = [];
+        $approved = [];
         $emailsendedcount = 0;
-        if ($count > 0) {
-            $success = true;
-            $emailsendedcount = $this->sendEmailData($this->prepareEmailData($requestArray), 'approved');
-        } else {
-            $success = false;
-        }
-        return response(json_encode(array(
-            "success" => $success,
-            "approvedcount" => $count,
-            "emailsendedcount" => $emailsendedcount
-        ),JSON_UNESCAPED_UNICODE), 200);
-    }
+        $login = explode("@",$_SERVER['REMOTE_USER'])[0];
+        $requestArray = json_decode($request->get('data'), true);
 
-    public function approve($requestArray, $login)
-    {
-        $count = 0;
         foreach (array_keys($requestArray) as $key) {
             $newRecord = modelRequests::find($requestArray[$key]);
-            if ($newRecord->approve_user == $login) {
+            if (($newRecord->status == 'Новый') && ($newRecord->approve_user == $login)) {
                 $newRecord->updated_user = $login;
                 $newStatus = new ModelStatus;
                 $newRecord->status = $newStatus::findOrFail(2)->name;
                 $newRecord->save();
-                $count++;
-            };
+                array_push($approved, $requestArray[$key]);
+            } else {
+                array_push($failed, $requestArray[$key]);
+            }
         };
-        return $count;
-    }
-
-    public function declinerequest($id)
-    {
-        $newRecord = modelRequests::find($id);
-        $newRecord->updated_user = explode("@",$_SERVER['REMOTE_USER'])[0];
-        $newStatus = new ModelStatus;
-        $newRecord->status = $newStatus::findOrFail(3)->name;
-        $newRecord->save();
-        $emailsendedcount = $this->sendEmailData($this->prepareEmailData([$id]), 'declined');
-
+        if (count($approved) > 0) {
+            $emailsendedcount = $this->sendEmailData($this->prepareEmailData($approved), 'approved');
+        }
         return response(json_encode(array(
             "success" => true,
-            "declinedrequest" => $newRecord->id,
-            "emailsendedcount" => $emailsendedcount,
+            "approved" => $approved,
+            "failed" => $failed,
+            "emailsendedcount" => $emailsendedcount
         ),JSON_UNESCAPED_UNICODE), 200);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function declinerequests(Request $request)
     {
-        //
+        $failed = [];
+        $declined = [];
+        $login = explode("@",$_SERVER['REMOTE_USER'])[0];
+        $requestArray = json_decode($request->get('data'), true);
+
+        foreach (array_keys($requestArray) as $key) {
+            $newRecord = modelRequests::find($requestArray[$key]);
+            if (($newRecord->status == 'Новый') && ($newRecord->approve_user == $login)) {
+                $newRecord->updated_user = $login;
+                $newStatus = new ModelStatus;
+                $newRecord->status = $newStatus::findOrFail(3)->name;
+                $newRecord->save();
+                array_push($declined, $requestArray[$key]);
+            } else {
+                array_push($failed, $requestArray[$key]);
+            }
+        };
+
+        if (count($declined) > 0) {
+            $emailsendedcount = $this->sendEmailData($this->prepareEmailData($declined), 'declined');
+        }
+
+        return response(json_encode(array(
+            "success" => true,
+            "declined" => $declined,
+            "failed" => $failed,
+            "emailsendedcount" => $emailsendedcount
+        ),JSON_UNESCAPED_UNICODE), 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }

@@ -57,19 +57,7 @@ Ext.define('InOut.view.outgoingrequests.controlOutgoingRequests', {
                             //это если надо отправить только выделенные строки
                             me.view.getSelectionModel().getSelection().forEach(function(item) {
                                 array.push(item.data.id);
-                                var rec = Ext.data.Record;
-                                Ext.Ajax.request({
-                                    scope: this,
-                                    method: 'GET',
-                                    url: '/testaaa/' + item.data.id,
-                                    success: function(response){
-                                        console.log(Ext.decode(response.responseText).data);
-                                        rec.data = Ext.decode(response.responseText).data;
-                                        console.log(rec);
-                                    }
-                                })
                             });
-                            console.log(array);
                             //это если надо перебрать всё в гриде
                             /* me.view.getStore().data.items.forEach(function(item) {
                              array.push(item.data.id);
@@ -79,11 +67,14 @@ Ext.define('InOut.view.outgoingrequests.controlOutgoingRequests', {
                                 method: 'POST',
                                 url: '/deleterequest',
                                 params: {data: Ext.JSON.encode(array)},
-                                success: function() {
+                                success: function(response) {
                                     me.getStore('storeOutgoingRequests').reload();
-                                },
-                                failure: function (response) {
-                                    Ext.alert('Ошибка', response)
+                                    console.log(Ext.decode(response.responseText));
+                                    if (Ext.decode(response.responseText).failed.length > 0) {
+                                        Ext.Msg.alert('Не удалены некоторые заявки:', Ext.decode(response.responseText).failed);
+                                    } else {
+                                        Ext.lib.customFunctions.showToast('Все выбранные заявки удалены');
+                                    }
                                 }
                             });
                         } else {
@@ -93,7 +84,6 @@ Ext.define('InOut.view.outgoingrequests.controlOutgoingRequests', {
                 }
                 else {
                     Ext.lib.customFunctions.showToast('Нечего удалять');
-                    //Ext.MessageBox.alert('Нечего удалять','Ничего не выделено!' );
                 }
                 break;
             }

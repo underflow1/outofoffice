@@ -31,7 +31,7 @@ Ext.define('InOut.view.request.windowRequest', {
     controller: 'windowrequestviewcontroller',
     viewModel: {type: 'windowrequestviewmodel'},
 
-    defaultFocus: 'approve_fio',
+    defaultFocus: 'approve_picker',
     width: 450,
     title: 'Создать запись',
     modal: true,
@@ -57,8 +57,8 @@ Ext.define('InOut.view.request.windowRequest', {
             items: [
                 {
                     allowBlank: false,
-                    name: 'approve_fio',
-                    id: 'approve_fio',
+                    name: 'approve_picker',
+                    id: 'approve_picker',
                     xtype: 'combobox',
                     fieldLabel: 'Руководитель',
                     valueField: 'fullname',
@@ -68,6 +68,10 @@ Ext.define('InOut.view.request.windowRequest', {
                     hideTrigger:false,
                     minChars: 3,
                     store: 'storeADUsers',
+                    bind: {
+                        disabled: '{fieldsDisabled}',
+                        hidden: '{fieldsDisabled}'
+                    },
                     listConfig: {
                         loadingText: 'Поиск...',
                         emptyText: 'Совпадений не найдено.',
@@ -83,6 +87,7 @@ Ext.define('InOut.view.request.windowRequest', {
                             console.log(b.data);
                             Ext.getCmp('approve_user').setValue(b.data.login);
                             Ext.getCmp('approve_email').setValue(b.data.email);
+                            Ext.getCmp('approve_fio').setValue(b.data.fullname);
                         },
                         expand: function (combo) {
                             var lll = '';
@@ -98,8 +103,18 @@ Ext.define('InOut.view.request.windowRequest', {
                     }
                 },
                 {
-                    name: 'absent_fio',
-                    id: 'absent_fio',
+                    name: 'approve_fio',
+                    id: 'approve_fio',
+                    xtype: 'textfield',
+                    fieldLabel: 'Руководитель',
+                    bind: {
+                        hidden: '{!fieldsDisabled}'
+                    },
+                    editable: false
+                },
+                {
+                    name: 'absent_picker',
+                    id: 'absent_picker',
                     xtype: 'combobox',
                     fieldLabel: 'Отсутствующий',
                     valueField: 'fullname',
@@ -109,6 +124,10 @@ Ext.define('InOut.view.request.windowRequest', {
                     hideTrigger:false,
                     minChars: 3,
                     store: 'storeADUsers',
+                    bind: {
+                        disabled: '{fieldsDisabled}',
+                        hidden: '{fieldsDisabled}'
+                    },
                     listConfig: {
                         loadingText: 'Поиск...',
                         emptyText: 'Совпадений не найдено.',
@@ -124,6 +143,7 @@ Ext.define('InOut.view.request.windowRequest', {
                         console.log(b.data);
                         Ext.getCmp('absent_user').setValue(b.data.login);
                         Ext.getCmp('absent_email').setValue(b.data.email);
+                        Ext.getCmp('absent_fio').setValue(b.data.fullname);
                     },
                     expand: function (combo) {
                         var lll = '';
@@ -137,6 +157,16 @@ Ext.define('InOut.view.request.windowRequest', {
                         }
                     }
                 }
+                },
+                {
+                    name: 'absent_fio',
+                    id: 'absent_fio',
+                    xtype: 'textfield',
+                    fieldLabel: 'Отсутствующий',
+                    bind: {
+                        hidden: '{!fieldsDisabled}'
+                    },
+                    editable: false
                 },
                 {
                     name: 'absent_date',

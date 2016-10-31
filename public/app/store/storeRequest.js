@@ -8,7 +8,7 @@ Ext.define('InOut.store.storeRequest', {
     autoLoad: false,
     proxy: {
         type: 'ajax',
-        url: '/testaaa/0',
+        url: '/preloadrecord/0',
         reader: {
             type: 'json',
             rootProperty: 'data',

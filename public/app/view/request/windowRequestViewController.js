@@ -23,6 +23,7 @@ Ext.define('InOut.view.request.windowRequestViewController', {
             Ext.Ajax.request({
                 url: '/currentuser',
                 success: function(response) {
+                    Ext.getCmp('absent_picker').setValue(Ext.decode(response.responseText).data.fullname);
                     Ext.getCmp('absent_fio').setValue(Ext.decode(response.responseText).data.fullname);
                     Ext.getCmp('absent_email').setValue(Ext.decode(response.responseText).data.email);
                     Ext.getCmp('absent_user').setValue(Ext.decode(response.responseText).data.login);
@@ -36,32 +37,41 @@ Ext.define('InOut.view.request.windowRequestViewController', {
         switch (btn.action) {
             case 'addnewrequest':
                 if (form.isValid()) {
-                    console.log(form.getForm().getValues());
-                    Ext.Ajax.request({
-                        scope: this,
-                        method: 'POST',
-                        url: '/addnewrequest',
-                        params: {data: Ext.JSON.encode(form.getForm().getValues())},
-                        success: function(response) {
-                            if (Ext.decode(response.responseText).state == 'created & approved') {
-                                Ext.Msg.alert('Уведомление','Заявка согласована автоматически.');
-                            }  else {
-                                if (Ext.decode(response.responseText).state == 'created') {
-                                    Ext.lib.customFunctions.showToast('Создана новая заявка.');
-                                } else {
-                                    Ext.Msg.alert('Ошибка','Что-то пошло не так...');
+                    $data = form.getForm().getValues();
+                    console.log($data);
+                    delete $data.approve_picker;
+                    delete $data.absent_picker;
+                    console.log($data);
+                    if (form.getForm().getValues().approve_picker == form.getForm().getValues().approve_fio) {
+                        Ext.Ajax.request({
+                            scope: this,
+                            method: 'POST',
+                            url: '/addnewrequest',
+                            params: {data: Ext.JSON.encode($data)},
+                            success: function(response) {
+                                form.up('window').hide();
+                                if (Ext.decode(response.responseText).state == 'created & approved') {
+                                    Ext.Msg.alert('Уведомление','Заявка согласована автоматически.');
+                                }  else {
+                                    if (Ext.decode(response.responseText).state == 'created') {
+                                        Ext.lib.customFunctions.showToast('Создана новая заявка.');
+                                    } else {
+                                        Ext.Msg.alert('Ошибка','Что-то пошло не так...');
+                                    }
                                 }
+                                console.log(response.responseText);
+                                Ext.getStore('storeOutgoingRequests').reload();
+                                Ext.getStore('storeIncomingRequests').reload();
+                                form.up('window').close();
+                            },
+                            failure: function (response) {
+                                console.log(response.responseText);
+                                //
                             }
-                            console.log(response.responseText);
-                            Ext.getStore('storeOutgoingRequests').reload();
-                            Ext.getStore('storeIncomingRequests').reload();
-                            form.up('window').close();
-                        },
-                        failure: function (response) {
-                            console.log(response.responseText);
-                            //
+                        });
+                    } else {
+                        Ext.lib.customFunctions.showToast('ФИО руководителя должно совпадать с выбранным из выпадающего списка!');
                     }
-                    });
                 } else {
                     Ext.Msg.alert('Ошибка!','Необходимо выбрать ФИО руководителя из выпадающего списка');
                 }
@@ -79,13 +89,17 @@ Ext.define('InOut.view.request.windowRequestViewController', {
                         url: '/approverequests',
                         params: {data: Ext.JSON.encode(array)},
                         success: function(response) {
-                            console.log(Ext.decode(response.responseText));
+                            form.up('window').hide();
+                            //console.log(Ext.decode(response.responseText));
                             Ext.getStore('storeOutgoingRequests').reload();
                             Ext.getStore('storeIncomingRequests').reload();
+                            console.log('Согласованные: ' + Ext.decode(response.responseText).approved)
+                            if (Ext.decode(response.responseText).failed.length == 0) {
+                                Ext.lib.customFunctions.showToast('Заявка согласована успешно');
+                            } else {
+                                Ext.lib.customFunctions.showToast('Заявка уже была обработана ранее');
+                            }
                             form.up('window').close();
-                        },
-                        failure: function (response) {
-                            Ext.Msg.alert('Ошибка!','Что то не так..!!!!!!!!!!!!.');
                         }
                     });
                 } else {
@@ -93,19 +107,25 @@ Ext.define('InOut.view.request.windowRequestViewController', {
                 }
                 break;
             case 'declinerequest':
-                idd = form.getForm().getValues().id;
+                var array = [];
+                array.push(form.getForm().getValues().id);
                 if (form.isValid()) {
                     Ext.Ajax.request({
                         scope: this,
                         method: 'POST',
-                        url: '/declinerequest/' + idd,
+                        url: '/declinerequests',
+                        params: {data: Ext.JSON.encode(array)},
                         success: function(response) {
+                            form.up('window').hide();
                             Ext.getStore('storeOutgoingRequests').reload();
                             Ext.getStore('storeIncomingRequests').reload();
+
+                            if (Ext.decode(response.responseText).failed.length == 0) {
+                                Ext.lib.customFunctions.showToast('Заявка отклонена')
+                            } else {
+                                Ext.lib.customFunctions.showToast('Заявка уже была обработана ранее')
+                            }
                             form.up('window').close();
-                        },
-                        failure: function (response) {
-                            Ext.Msg.alert('Ошибка!','Что то не так..!!!!!!!!!!!!.');
                         }
                     });
                 } else {

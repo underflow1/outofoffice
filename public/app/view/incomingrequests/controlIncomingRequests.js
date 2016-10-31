@@ -62,12 +62,18 @@ Ext.define('InOut.view.incomingrequests.controlIncomingRequests', {
                         params: {data: Ext.JSON.encode(array)},
                         success: function(response) {
                             //me.getStore('storeIncomingRequests').reload();
+                            if (Ext.decode(response.responseText).failed.length == 0) {
+                                Ext.lib.customFunctions.showToast('Все выбранные заявки согласованы успешно');
+                            } else {
+                                Ext.Msg.alert('Не удалены некоторые заявки:', Ext.decode(response.responseText).failed);
+                            }
+                            console.log(Ext.decode(response.responseText).failed.length);
                             Ext.getStore('storeOutgoingRequests').reload();
                             Ext.getStore('storeIncomingRequests').reload();
                             console.log(Ext.decode(response.responseText));
                         },
                         failure: function (response) {
-                            Ext.alert('Ошибка', response)
+                            Ext.Msg.alert('Ошибка', response)
                         }
                     });
                 }

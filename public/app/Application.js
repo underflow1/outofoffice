@@ -85,40 +85,50 @@ Ext.define('InOut.Application', {
 
     onShowRequestRoute: function(id) {
         console.log('onShowRequestRoute!!!!!!!!');
-        var store = Ext.getStore('storeRequest');
-        store.getProxy().url = 'testaaa/'+ id;
-        store.load();
-        store.on('load', function(store, records) {
-            if (Ext.isEmpty(records[0])) {
-                Ext.lib.customFunctions.showToast('Такой записи не существует!');
-            } else {
-                if (records[0].data.deleted) {
-                    Ext.lib.customFunctions.showToast('Эта запись была удалена пользователем ' + records[0].data.   updated_user);
-                } else {
-                    if (records[0].data.status == 'Новый') {
-                        var window = Ext.create('InOut.view.request.windowRequest', {
-                            title: 'Согласование запроса.',
-                            viewModel:{
-                                data: {
-                                    showMode: 'Approve'
-                                }
-                            }
-                        });
-                        window.down('form').loadRecord(records[0]);
-                        window.show();
+        Ext.Ajax.request({
+            scope: this,
+            method: 'GET',
+            url: 'preloadrecord/'+ id,
+            success: function(response) {
+                var store = Ext.getStore('storeRequest');
+                store.getProxy().url = 'preloadrecord/'+ id;
+                store.load();
+                store.on('load', function(store, records) {
+                    if (Ext.isEmpty(records[0])) {
+                        Ext.Msg.alert('Ошибка!', 'Такой записи не существует!');
                     } else {
-                        var window = Ext.create('InOut.view.request.windowRequest', {
-                            title: 'Запрос уже обработан!',
-                            viewModel:{
-                                data: {
-                                    showMode: 'ReadOnly'
-                                }
+                        if (records[0].data.deleted) {
+                            Ext.Msg.alert('Ошибка!','Эта запись была удалена пользователем ' + records[0].data.   updated_user);
+                        } else {
+                            if (records[0].data.status == 'Новый') {
+                                var window = Ext.create('InOut.view.request.windowRequest', {
+                                    title: 'Согласование запроса.',
+                                    viewModel:{
+                                        data: {
+                                            showMode: 'Approve'
+                                        }
+                                    }
+                                });
+                                window.down('form').loadRecord(records[0]);
+                                window.show();
+                            } else {
+                                var window = Ext.create('InOut.view.request.windowRequest', {
+                                    title: 'Запрос уже обработан!',
+                                    viewModel:{
+                                        data: {
+                                            showMode: 'ReadOnly'
+                                        }
+                                    }
+                                });
+                                window.down('form').loadRecord(records[0]);
+                                window.show();
                             }
-                        });
-                        window.down('form').loadRecord(records[0]);
-                        window.show();
+                        }
                     }
-                }
+                })
+            },
+            failure: function(response){
+                Ext.Msg.alert('Ошибка!','У вас нет доступа к этой заявке.');
             }
         })
     },
