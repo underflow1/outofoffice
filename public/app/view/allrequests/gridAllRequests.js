@@ -15,7 +15,7 @@ Ext.define('InOut.view.allrequests.gridAllRequests', {
         'Ext.grid.column.Date',
         'Ext.grid.column.Boolean'
     ],
-    //viewModel: {type: 'modelAllRequests'},
+    viewModel: {type: 'modelAllRequests'},
     controller: 'controlallrequests',
     defaultToken: 'all',
 

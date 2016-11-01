@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\modelRequests;
+use App\modelRights;
 use App\modelStatus;
 use Excel;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class controlRequests extends Controller
 {
@@ -34,6 +36,30 @@ class controlRequests extends Controller
             "success" => true,
             "data" => $results
         ),JSON_UNESCAPED_UNICODE);
+    }
+
+    public function oebaccess()
+    {
+        $login = explode("@",$_SERVER['REMOTE_USER'])[0];
+        try
+        {
+            $access = modelRights::findOrFail($login)->access;
+        }
+        catch(ModelNotFoundException $e)
+        {
+            return response(json_encode(array(
+                "success" => false,
+            ),JSON_UNESCAPED_UNICODE),401);
+        }
+        if ($access) {
+            return response(json_encode(array(
+                "success" => true
+            ),JSON_UNESCAPED_UNICODE),200);
+        } else {
+            return response(json_encode(array(
+                "success" => false
+            ),JSON_UNESCAPED_UNICODE),401);
+        }
     }
 
     public function preloadrecord($id)
@@ -70,6 +96,63 @@ class controlRequests extends Controller
         ),JSON_UNESCAPED_UNICODE);
     }
 
+    public function allrequestsrange($archive_date_begin, $archive_date_end)
+    {
+        $succ = $this->oebaccess()->original;
+        if ($succ == '{"success":true}') {
+            $results = modelRequests::where('deleted', 0)
+                ->whereBetween('absent_date', array($archive_date_begin, $archive_date_end))
+                ->orderBy('absent_date', 'desc')
+                ->orderBy('id', 'desc')
+                ->get();
+            return json_encode(array(
+                "success" => true,
+                "data" => $results
+            ),JSON_UNESCAPED_UNICODE);
+        } else {
+            return json_encode(array(
+                "success" => false,
+                "data" => ''
+            ),JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    public function allrequestsrangeexcel($archive_date_begin, $archive_date_end)
+    {
+        $succ = $this->oebaccess()->original;
+        if ($succ == '{"success":true}') {
+            $results = modelRequests::where('deleted', 0)
+                ->whereBetween('absent_date', array($archive_date_begin, $archive_date_end))
+                ->orderBy('absent_date', 'desc')
+                ->orderBy('id', 'desc')
+                ->select(
+                    'absent_fio as Отсутствующий',
+                    'approve_fio as Согласующий',
+                    'absent_date as Дата отсутствия',
+                    'absent_time_begin as Начало',
+                    'absent_time_end as Конец',
+                    'absent_reason as Тип',
+                    'absent_comment as Комментарий',
+                    'status as Статус'
+                )
+                ->get();
+
+            return Excel::create('Отчет вне офиса', function($excel) use ($results) {
+                $excel->setTitle('Выгрузка')
+                    ->setCreator(explode("@",$_SERVER['REMOTE_USER'])[0])
+                    ->setCompany('')
+                    ->setDescription('Выгрузка из базы данных вне офиса');
+                $excel->sheet('Лист1', function($sheet) use ($results){
+                    $sheet->fromArray($results);
+                });
+            })->download('xlsx');
+        } else {
+            return response(json_encode(array(
+                "success" => false,
+            ),JSON_UNESCAPED_UNICODE),401);
+        }
+    }
+
     public function archivedrequestsrangeexcel($archive_date_begin, $archive_date_end)
     {
         $login = explode("@",$_SERVER['REMOTE_USER'])[0];
@@ -80,7 +163,6 @@ class controlRequests extends Controller
             ->orderBy('absent_date', 'desc')
             ->orderBy('id', 'desc')
             ->select(
-                'created_at as Создано',
                 'absent_fio as Отсутствующий',
                 'approve_fio as Согласующий',
                 'absent_date as Дата отсутствия',
@@ -182,7 +264,7 @@ class controlRequests extends Controller
 
         foreach (array_keys($requestArray) as $key) {
             $newRecord = modelRequests::find($requestArray[$key]);
-            if (($newRecord->status == 'Новый') && ($newRecord->approve_user == $login)) {
+            if (($newRecord->status == 'Новый') && ($newRecord->approve_user == $login) && ($newRecord->deleted == 0)) {
                 $newRecord->updated_user = $login;
                 $newStatus = new ModelStatus;
                 $newRecord->status = $newStatus::findOrFail(2)->name;
@@ -212,7 +294,7 @@ class controlRequests extends Controller
 
         foreach (array_keys($requestArray) as $key) {
             $newRecord = modelRequests::find($requestArray[$key]);
-            if (($newRecord->status == 'Новый') && ($newRecord->approve_user == $login)) {
+            if (($newRecord->status == 'Новый') && ($newRecord->approve_user == $login) && ($newRecord->deleted == 0)) {
                 $newRecord->updated_user = $login;
                 $newStatus = new ModelStatus;
                 $newRecord->status = $newStatus::findOrFail(3)->name;

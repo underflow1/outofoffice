@@ -87,10 +87,13 @@ Ext.define('InOut.view.Viewport', {
                 },
                 {
                     xtype: 'gridallrequests',
+                    id: 'gridallrequests',
                     title: 'ОЭБ',
+                    //hidden: true,
                     listeners: {
                         activate: function (){
                             var me = this;
+                            
                             var startDate = Ext.getCmp('all_date_begin').getSubmitValue();
                             var endDate = Ext.getCmp('all_date_end').getSubmitValue();
                             me.view.getStore().getProxy().url = '/allrequestsrange/' + startDate + '/' + endDate;

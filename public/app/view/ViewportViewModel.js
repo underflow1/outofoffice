@@ -18,7 +18,7 @@ Ext.define('InOut.view.ViewportViewModel', {
     alias: 'viewmodel.viewportviewmodel',
 
     formulas: {
-        
+
     }
 
 });

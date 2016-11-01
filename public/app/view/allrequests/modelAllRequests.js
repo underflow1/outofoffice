@@ -11,7 +11,7 @@ Ext.define('InOut.view.allrequests.modelAllRequests', {
             autoLoad: false,
             proxy: {
                 type: 'ajax',
-                    url: '/allrequests',
+                    url: '/allrequestsrange',
                 reader: {
                     type: 'json',
                     rootProperty: 'data',

@@ -18,7 +18,20 @@ Ext.define('InOut.view.ViewportViewController', {
     alias: 'controller.viewportviewcontroller',
 
     init: function() {
+        Ext.Ajax.request({
+            method: 'GET',
+            url: '/oebaccess',
+            success: function(response) {
 
+            },
+            failure: function(response) {
+                var mainPanel = Ext.getCmp('maintabpanel');
+                if (mainPanel){
+                    mainPanel.remove(Ext.getCmp('gridallrequests'));
+                }
+
+            }
+        });
     },
 
     activategridarchivedrequests: function(){
